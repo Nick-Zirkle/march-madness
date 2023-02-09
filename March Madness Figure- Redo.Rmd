@@ -1,0 +1,31 @@
+---
+title: "March Madness Figure"
+author: "Nick Zirkle"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=F, warning=F}
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+conferences <- read.csv("MTeamConferences.csv")
+conferences_2022 <- conferences %>% subset(Season == "2022")
+counter <- conferences_2022 %>% count(ConfAbbrev)
+```
+
+```{r}
+ggplot(counter, aes(x = ConfAbbrev, y = n)) +
+  geom_bar(stat = "identity") +
+  xlab("Conference Abbreviation") +
+  ylab("Number of Teams") +
+  theme_get() +
+  ggtitle("Number of Basketball Teams per NCAA Conference in 2022") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
