@@ -1,0 +1,59 @@
+Improved NCAA Basketball Tournament Modeling- Summary
+================
+Nick Zirkle
+
+      This article talks about some ways to improve statistical and
+predictive modeling for the NCAA tournament, specifically in predicting
+the 4 regional champions who make the Final Four. While previous
+statisticians had estimated these odds using complicated formulas and
+calculations, the authors wanted to make use of more common
+pre-tournament information to help predict regional champion outcomes,
+including RPI, Sagarin ratings, and sports wagering point spreads (only
+for the first round of games). The authors focused mainly on point
+spreads because they take into account “game- and time-specific
+information, such as injuries”.
+
+      Initially the authors used a fitted regression line based on
+squared difference in seeds to predict the results of first round games,
+resulting in a relatively accurate comparison to the data at
+$R^2 = 0.883$. However, when they re-fit a regression using difference
+in Sagarin ratings instead of squared difference in seeds, they found
+that this model compared extremely similarly to the data given, with
+$R^2 = 0.981$.
+
+      They then started to try and apply this given information to the
+1994 NCAA tournament, and attempt to predict regional champions from
+this tournament. They first looked at the Schwertmann method, which
+allocated almost 50% probability to the top seed, and only about 5%
+probability between the bottom 8 seeds per region (seeds 9-16). They
+then predicted probabilities using a combination of the point spread and
+seed difference regressions, which gave larger probabilities to higher
+seeds (not including the 1 seed) and much lower probabilities to the
+bottom 8 seeds (about 2% probability for seeds 9-16).
+
+      They then predicted probabilities using the un-adjusted Sagarin
+rating differences, which were both year- and region-specific. They
+noticed that the 1 seed probability dropped again, while the bottom 8
+seed probabilities all stayed around 2% cumulatively, and that the
+probabilities didn’t decrease linearly as seed decreased, like the
+previous predictions did. They then fit two more predictions using the
+Sagarin rating differences being adjusted by the previous regression
+model and the actual point spreads, respectively. They found that these
+final two predictions started to reward the best couple of teams in the
+tournament with higher probabilities, while further punishing the lower
+8 seeds.
+
+      This last approach using the Sagarin ratings and actual point
+spreads was then applied to all 64 teams in the tournament. This
+approach didn’t always favor 1 seeds however, as the 2 seed Arizona was
+favored to win the West region over the 1 seed Missouri.
+
+      The authors then introduce Schwertmann’s way of comparing the
+expected number of specific seeds to win their regions, which turned out
+just to be the average log-win probability of favored teams in the
+tournament. This equation was then applied to all of the previous
+prediction methods, which all showed significant improvement over the
+naive model (assuming each team has a 50% chance to win for each game)
+in terms of prediction ability. The best prediction model ended up being
+the previously mentioned method with the Sagarin ratings and actual
+point spreads.
