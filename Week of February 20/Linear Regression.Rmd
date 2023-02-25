@@ -1,0 +1,71 @@
+---
+title: "Linear Regression"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data <- read.csv("HistoricalDataset.csv")
+```
+
+Before proceeding with linear regression, I first wanted to think about what I expected the estimated models to look like. Since `Seed.Differential` and `Ordinal.Ranking.Differential` are calculated as `winning team seed/ordinal ranking - losing team seed/ordinal ranking`, and the lower seeds/ordinal rankings signify better teams, we would expect the point estimates for these variables to be negative. This is because extremely negative values for those variables mean that the winning team had a much better seed/ordinal ranking than the losing team, meaning we would want negative point estimates if we assume that a higher point differential is more likely to occur between less evenly-matched teams.
+
+```{r}
+no_intercept_model <- lm(Point.Differential ~ Seed.Differential + Ordinal.Ranking.Differential - 1, data = data)
+summary(no_intercept_model)
+```
+
+I decided to first fit a linear model without an intercept, since I was interested in the difference between this model and the model with an intercept. As we can see from our output, both of our point estimates are negative, which supports my previous hypothesis above that point differential is usually higher with less evenly-matched teams. Additionally, both of our estimates are "statistically significant" at p = 0.05, which is interesting to see. However, this model can predict negative point differentials based on the seed/ordinal ranking differentials, which is realistic for our eventual end goal of predicting game results, but isn't ideal when compared to our data, since all of our point differentials in our data were positive.
+
+```{r}
+intercept_model <- lm(Point.Differential ~ Seed.Differential + Ordinal.Ranking.Differential, data = data)
+summary(intercept_model)
+```
+
+I then decided to fit a linear model with an intercept term, and our results changed pretty drastically. Although it's not practical to analyze the intercept estimate in this case (since ordinal ranking differential can never be equal to zero), having the average point differential be about 9.5 for two "evenly-matched" teams (teams with no difference in seed and ordinal ranking) doesn't make sense in the context of our situation, since I'd assume that the games would be closer (on average) than 9-10 points. Additionally, while our ordinal ranking differential point estimate is negative like the previous model, our seed differential point estimate is positive. This estimate being positive means that according to our model, the winning team having a worse seed than the losing team adds to the average point differential, which goes against my previous hypothesis. Furthermore, while the intercept and ordinal ranking differential point estimates are both "statistically significant" at p = 0.05, the seed differential estimate is not "statistically significant" at this level, in addition to this model also still being able to predict negative point differentials based on the seed/ordinal ranking differentials. Based on the analysis given of this model, we should potentially rethink the form of our model or use the model with no intercept.
+
+```{r}
+seed_intercept_model <- lm(Point.Differential ~ Seed.Differential, data = data)
+summary(seed_intercept_model)
+```
+
+Because the seed differential point estimate wasn't "statistically significant" at p = 0.05 in the previous model, I decided to explore this variable more, and fit another model with an intercept term, but without the ordinal ranking differential variable. Based on the summary output, we once again find a similar intercept term point estimate to the previous model (about 9.7), but this time we find that our point estimate for the seed differential variable is negative, which agrees with my previous hypothesis from above. Additionally, both point estimates are "statistically significant" at p = 0.05, and this model can't predict negative point differentials, which matches our data pretty well, meaning that this model is pretty good at estimating point differentials for our data.
+
+```{r}
+seed_no_intercept_model <- lm(Point.Differential ~ Seed.Differential - 1, data = data)
+summary(seed_no_intercept_model)
+```
+
+I then fit a model without an intercept term and the ordinal ranking differential variable. We can see from the summary output that our point estimate for our seed differential variable is negative, which agrees with our previous hypothesis, and that this point estimate is "statistically significant" at p = 0.05. However, like our previous no intercept model, this model can predict negative point differentials, which doesn't match with our data super well.
+
+```{r}
+ordinal_intercept_model <- lm(Point.Differential ~ Ordinal.Ranking.Differential, data = data)
+summary(ordinal_intercept_model)
+```
+
+I then decided to do the same thing as the previous two models, but for the ordinal ranking differential variable instead of the seed differential variable. We get a very similar point estimate for the intercept term as the previous two intercept models (about 9.4), and we also see that the point estimate for the ordinal ranking differential variable is negative, which agrees with our previous hypothesis. Both point estimates are also "statistically significant" at p = 0.05. But even with the intercept term, this model can still predict negative point differentials, which isn't great for comparing to our data.
+
+```{r}
+ordinal_no_intercept_model <- lm(Point.Differential ~ Ordinal.Ranking.Differential - 1, data = data)
+summary(ordinal_no_intercept_model)
+```
+
+I then continued the previous trend by fitting a model with no intercept and the ordinal ranking differential variable. Our point estimate for this variable is negative and "statistically significant" at p = 0.05, but our model can once again predict negative point differentials, making it likely a bad candidate for predicting our data.
+
+```{r}
+anova(intercept_model, no_intercept_model, ordinal_intercept_model,
+           ordinal_no_intercept_model, seed_intercept_model, seed_no_intercept_model)
+```
+
+Because I had trouble deciding which linear model to use to estimate the data, I decided to run `anova()` to compare the validity of each of the prospective models. Based on the residual sum of squares output for each model, it appears as though the two best models for estimating our data are the intercept model with both seed and ordinal ranking differential variables, and the intercept model with only the ordinal ranking differential variable. The intercept model with only the seed differential variable was also relatively good at predicting the data, but not as good as the other two previously mentioned models.
+
+```{r}
+anova(intercept_model, ordinal_intercept_model)
+```
+
+I decided to then use `anova()` again to compare just the two previously mentioned models. According to the output, it appears as though the intercept model with only the ordinal ranking differential variable is not "statistically significantly" better than the intercept model with both variables at p = 0.05, meaning we should go proceed with our intercept model with both variables, seen below:
+
+Point.Differential = 9.5001 + 0.0932 * Seed.Differential - 0.0727 * Ordinal.Ranking.Differential
