@@ -1,0 +1,73 @@
+Brier Score- Article Summary
+================
+Nick Zirkle
+
+      The Brier score is a statistic measuring accuracy dealing with
+sets of probabilistic predictions. We use this when we are interested in
+how accurate a predictor’s predictions are, not just how often they are
+technically correct. This can be best explained by describing a scenario
+with two predictors, one who predicts a 60% chance of snow tomorrow, and
+one who predicts a 90% chance of snow tomorrow. If it were to snow
+tomorrow, they would both technically be correct in their predictions,
+since both of these probabilities are above 50%. However, we would want
+to reward the second predictor for having a “more accurate” predictions,
+since his probability was close to the event occurrence of 100%. The
+Brier score does this through calculating a mean of squared differences
+between each probability and the event occurrence, written as:
+
+$$\frac{1}{N} \sum_{t = 1}^N (f_t - o_t)^2$$
+
+-   N is the number of events included
+-   t indexes from 1 to N
+-   $f_t$ is the probability (from 0 to 1) of event t
+-   $o_t$ is the result (0 or 1) of event t
+
+      Brier scores are bound between 0 and 1, where 0 is a perfect set
+of predictions (every event that happens predicted as 1, and every event
+that didn’t happen predicted as 0), and 1 is a completely inaccurate set
+of predictions (every event that happens predicted as 0, and every event
+that didn’t happen predicted as 1). For context, if we naively guessed
+every event’s probability, we would earn a Brier score of 0.25, meaning
+that scores below 0.25 are considered better than random odds, and
+scores above 0.25 are considered worse than random odds. Additionally,
+we can compare Brier scores to each other using the Brier skill score,
+written as:
+
+$$1 - \frac{BS_f}{BS_{ref}}$$
+
+-   $BS_f$ is the first Brier score (usually our Brier score)
+-   $BS_{ref}$ is the second Brier score (usually the reference Brier
+    score)
+
+      Brier skill scores are bound between $-\infty$ and 1, where
+positive numbers indicate an improvement on a reference Brier score (we
+also get a Brier skill score of 1 when the first Brier score is perfect
+and the second Brier score is completely inaccurate). A Brier skill
+score of 0 indicates no change from the reference Brier score, and
+negative numbers indicate a downgrade on a reference Brier score.
+
+      However, the biggest downside of this original Brier score is that
+it only deals with predictions of events with a maximum of two potential
+outcomes (only binary predictions). However, if we modify the original
+Brier score formula, we can calculate the Brier score for events with
+\>2 outcomes, written as:
+
+$$\frac{1}{N} \sum_{t = 1}^N \sum_{c = 1}^R (f_{tc} - o_{tc})^2$$
+
+-   N is the number of events included
+-   t indexes from 1 to N
+-   R is the number of possible outcomes per event
+-   c indexes from 1 to R
+-   $f_{tc}$ is the probability (from 0 to 1) of outcome c of event t
+-   $o_{tc}$ is the result (0 or 1) of outcome c of event t
+
+      Unlike the original Brier score, this multi-category Brier score
+is bounded from 0 to 2, where 0 is a perfect set of predictions (the
+event that happens predicted as 1, and every other event that didn’t
+happen predicted as 0), and 2 is a completely inaccurate set of
+predictions (the event that happens predicted as 0, and every other
+event that didn’t happen predicted as 1). With the original and
+multi-category versions of the Brier score, we can calculate the
+accuracy of a set of event predictions, which happens to be the
+statistic that Kaggle is going to use to analyze the win probability
+predictions that we’ll submit for their NCAA March Madness Competition.
